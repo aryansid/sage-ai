@@ -6,7 +6,7 @@ import SearchResultsPage from './components/SearchResultPage'; // Import the Sea
 
 const App = () => {
   return (
-    <Router>
+    <Router>  
       <Routes>
         <Route path="/" element={<HomePage />} />
         {/* <Route path="/search" element={<SearchPage />} /> */}
