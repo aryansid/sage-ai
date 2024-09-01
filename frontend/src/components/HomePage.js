@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from "framer-motion";
 import Typed from 'typed.js';
-import NavBar from './NavBar';
+
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -47,7 +47,6 @@ const HomePage = () => {
       <div 
         className={`absolute inset-0 bg-gradient-to-tl from-purple-900/50 to-transparent transition-opacity duration-1000 ease-in-out ${gradientVisible ? 'opacity-100' : 'opacity-0'}`}
       ></div>
-      <NavBar transparent={true} />
       <div className="flex-grow flex flex-col items-center justify-center p-4 text-center">
         <motion.h1 
           className="text-4xl md:text-6xl font-bold text-white mb-6"
