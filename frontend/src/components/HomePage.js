@@ -46,8 +46,9 @@ const HomePage = () => {
     <div className="min-h-screen bg-black flex flex-col relative overflow-hidden">
       <div 
         className={`absolute inset-0 bg-gradient-to-tl from-purple-900/50 to-transparent transition-opacity duration-1000 ease-in-out ${gradientVisible ? 'opacity-100' : 'opacity-0'}`}
+        style={{ zIndex: 1 }}
       ></div>
-      <div className="flex-grow flex flex-col items-center justify-center p-4 text-center">
+      <div className="flex-grow flex flex-col items-center justify-center p-4 text-center relative" style={{ zIndex: 2 }}>
         <motion.h1 
           className="text-4xl md:text-6xl font-bold text-white mb-6"
           initial={{ opacity: 0, y: -20 }}
@@ -77,7 +78,8 @@ const HomePage = () => {
         >
           <button 
             onClick={() => navigate('/search')}
-            className="bg-white text-black hover:bg-gray-200 text-lg px-8 py-6 rounded-full transition-transform hover:scale-105"
+            className="bg-white text-black hover:bg-gray-200 text-lg px-7 py-5 rounded-full transition-transform hover:scale-105"
+            style={{ zIndex: 3 }}
           >
             Begin Search
           </button>
