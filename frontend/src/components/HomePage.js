@@ -1,68 +1,63 @@
 // frontend/src/components/HomePage.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ValidationBanner from './ValidationBanner';
-import NavBar from './NavBar';
+import { motion } from "framer-motion";
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const sucksRef = useRef(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const colors = ['#004aad', '#FFD700', '#00874d', '#FF0000']; // New order: blue, yellow, green, red
-    let currentIndex = 0;
-
-    const changeColor = () => {
-      if (sucksRef.current) {
-        sucksRef.current.style.color = colors[currentIndex];
-        currentIndex = (currentIndex + 1) % colors.length;
-      }
-    };
-
-    const intervalId = setInterval(changeColor, 500); // Change color every 1 second
-
-    return () => clearInterval(intervalId);
+    setMounted(true);
   }, []);
 
-  const handleSearch = () => {
-    // You can add any search logic here if needed
-    navigate('/search-results');
-  };
+  if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-white flex flex-col relative">
-      {/* <NavBar /> */}
-      <div className="flex-grow flex flex-col justify-center items-center px-4 py-12">
-        <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4 text-center">
-          Prior Art Search <span ref={sucksRef} className="transition-colors duration-300">Sucks</span>.
-        </h1>
-        <h2 className="text-2xl md:text-4xl font-semibold text-gray-900 mb-8 text-center">
-          We Make It Faster And Smarter.
-        </h2>
-        <p className="text-lg md:text-xl text-gray-700 mb-8 text-center max-w-2xl">
-          Type in your natural language patent query and watch as our AI driven solution
-          uncovers prior art at lightning speed and unparalleled accuracy.
-        </p>
-        <form onSubmit={handleSearch} className="w-full max-w-xl mb-12">
-          <div className="flex">
-            <input
-              type="text"
-              placeholder="Enter description of invention"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-grow py-3 px-4 bg-white border border-gray-300 rounded-l-lg text-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-300"
-            />
-            <button
-              type="submit"
-              className="px-6 py-3 bg-custom-blue text-white font-semibold rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            >
-              Search
-            </button>
-          </div>
-        </form>
-      </div>
-      <ValidationBanner />
+    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-4 text-center">
+      <motion.h1 
+        className="text-4xl md:text-6xl font-bold text-white mb-6"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        Revolutionize Your
+        <br />
+        <span className="text-5xl md:text-7xl bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+          Prior Art Search
+        </span>
+      </motion.h1>
+
+      <motion.p 
+        className="text-xl md:text-2xl text-gray-300 mb-12 max-w-2xl"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.8 }}
+      >
+        Type in your natural language patent query and watch as our AI driven solution uncovers prior art at lightning speed and unparalleled accuracy.
+      </motion.p>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8, duration: 0.8 }}
+      >
+        <button 
+          onClick={() => navigate('/search')}
+          className="bg-white text-black hover:bg-gray-200 text-lg px-8 py-6 rounded-full transition-transform hover:scale-105"
+        >
+          Begin Search
+        </button>
+      </motion.div>
+
+      <motion.p 
+        className="text-gray-500 mt-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2, duration: 0.8 }}
+      >
+        Empowering lawyers with cutting-edge technology
+      </motion.p>
     </div>
   );
 };
