@@ -120,18 +120,18 @@ interface EmailItemProps {
 
 function EmailItem({ title, id, abstract, labels, isActive = false }: EmailItemProps) {
   return (
-    <div className={`mb-2 p-3 rounded-lg border ${isActive ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-200'} hover:bg-gray-100 cursor-pointer transition-colors duration-200`}>
-      <div className="flex justify-between items-start mb-1">
+    <div className={`mb-4 p-4 rounded-lg border ${isActive ? 'bg-gray-100 border-gray-300' : 'bg-white border-gray-200'} hover:bg-gray-100 cursor-pointer transition-colors duration-200`}>
+      <div className="flex justify-between items-start mb-2">
         <h3 className="font-semibold text-sm">{title}</h3>
         <span className="text-xs text-gray-500">ID: {id}</span>
       </div>
-      <p className="text-xs text-gray-600 mb-2 text-left">{abstract}</p>
-      <div className="flex flex-wrap gap-1">
+      <p className="text-xs text-gray-600 mb-3 text-left">{abstract}</p>
+      <div className="flex flex-wrap gap-2">
         {labels.map((label) => (
           <Badge 
             key={label} 
             variant="secondary" 
-            className={`text-[10px] px-2 py-0.5 ${label === 'work' ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700'}`}
+            className={`text-xs px-2 py-1 ${label === 'work' ? 'bg-gray-900 text-white' : 'bg-gray-200 text-gray-700'}`}
           >
             {label}
           </Badge>
