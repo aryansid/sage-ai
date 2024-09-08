@@ -5,6 +5,7 @@ import ResultsPage from './ResultsPage';
 import PricingPage from './PricingPage';
 import SignUpPage from './SignUpPage';
 import HomePage from './HomePage';  // Import your existing HomePage
+import NavBar from './components/NavBar';  // Import the NavBar component
 import { Button } from './@/components/ui/button';  // Make sure this path is correct
 
 import './App.css';
