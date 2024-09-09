@@ -37,7 +37,12 @@ const NavBar: React.FC<NavBarProps> = ({ currentPage }) => {
           ))}
         </div>
         <div className="absolute right-4 sm:right-6 lg:right-8 flex items-center space-x-4">
-          {/* Add any additional buttons or links here */}
+          <Link
+            to="/signup"
+            className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center text-white text-sm font-semibold hover:bg-teal-600 transition-colors"
+          >
+            A
+          </Link>
         </div>
       </div>
     </nav>

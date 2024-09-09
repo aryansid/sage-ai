@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -31,25 +33,39 @@ export default function SignUpPage() {
       </div>
       <div className="w-full lg:w-1/2 p-8 sm:p-12 flex flex-col justify-between">
         <div className="flex justify-end">
-          <Link to="/login" className="text-sm font-medium hover:underline">
+          <Link to="/signin" className="text-sm font-medium hover:underline">
             Login
           </Link>
         </div>
         <div className="max-w-sm mx-auto w-full">
           <h1 className="text-3xl font-bold mb-4 text-center">Create an account</h1>
           <p className="text-sm text-gray-600 mb-6 text-center">
-            Enter your email below to create your account
+            Enter your details below to create your account
           </p>
           <form className="space-y-4" onSubmit={handleSubmit}>
             <Input 
               type="email" 
-              placeholder="name@example.com" 
+              placeholder="Company Email" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
+            <Input 
+              type="password" 
+              placeholder="Password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <Input 
+              type="text" 
+              placeholder="Company Name" 
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              required
+            />
             <Button className="w-full" type="submit">
-              Sign Up with Email
+              Sign Up
             </Button>
           </form>
           <p className="text-xs text-gray-600 mt-8 text-center">
