@@ -25,7 +25,7 @@ export default function SignUpPage() {
           </div>
         </div>
         <div className="text-left">
-          <blockquote className="text-2xl font-medium mb-4">
+          <blockquote className="text-2xl mb-4">
             "This prior art search tool has revolutionized my patent law practice. It's incredibly efficient and thorough, saving me countless hours on each case."
           </blockquote>
           <p className="font-medium">- Sarah Johnson, Patent Attorney</p>
@@ -64,7 +64,7 @@ export default function SignUpPage() {
               onChange={(e) => setCompanyName(e.target.value)}
               required
             />
-            <Button className="w-full" type="submit">
+            <Button className="w-full bg-black text-white hover:bg-gray-800" type="submit">
               Sign Up
             </Button>
           </form>

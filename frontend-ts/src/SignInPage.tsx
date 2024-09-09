@@ -15,52 +15,58 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-row-reverse">
-      <div className="w-full lg:w-1/2 bg-black text-white p-8 sm:p-12 flex flex-col justify-between">
+    <div className="flex min-h-screen">
+      <div className="w-full lg:w-1/2 p-8 sm:p-12 flex flex-col justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-4">Welcome back!</h2>
-          <p className="text-gray-400">Sign in to access your account and continue your journey.</p>
+          <div className="flex items-center space-x-2">
+            <span className="text-xl font-semibold">Sage</span>
+          </div>
         </div>
-        <div className="mt-auto">
-          <p className="text-sm text-gray-400">
-            &copy; {new Date().getFullYear()} Your Company Name. All rights reserved.
+        <div className="flex-grow flex flex-col justify-center">
+          <div className="max-w-sm mx-auto w-full">
+            <h1 className="text-3xl font-bold mb-4 text-left">Welcome Back</h1>
+            <p className="text-sm text-gray-600 mb-6 text-left">
+              Enter your credentials below to access your account
+            </p>
+            <form className="space-y-4" onSubmit={handleSubmit}>
+              <Input 
+                type="email" 
+                placeholder="Company Email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <Input 
+                type="password" 
+                placeholder="Password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <Button className="w-full bg-black text-white" type="submit">
+                Sign In
+              </Button>
+            </form>
+            <p className="text-sm text-gray-600 mt-4 text-left">
+              Forgot your password?
+            </p>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm text-center">
+            Don't have an account? <Link to="/signup" className="text-gray-600 hover:underline">Sign up</Link>
           </p>
         </div>
       </div>
-      
-      <div className="w-full lg:w-1/2 p-8 sm:p-12 flex flex-col justify-between">
-        <div>
-          <Link to="/" className="text-2xl font-bold">Your Logo</Link>
+      <div className="hidden lg:flex w-1/2 bg-black text-white p-12 flex flex-col justify-between">
+        <div className="flex-grow flex items-center">
+          <div className="max-w-xl mx-auto">
+            <blockquote className="text-2xl mb-4 text-left font-normal leading-relaxed">
+              "Their AI search tool has transformed our patent research process. It's uncannily accurate, saving us weeks of manual searching and dramatically improving our filing strategy."
+            </blockquote>
+            <p className="text-left font-bold">- Dr. Emily Chen, Chief IP Officer at TechInnovate Inc.</p>
+          </div>
         </div>
-        <div className="max-w-sm mx-auto w-full">
-          <h1 className="text-3xl font-bold mb-4 text-center">Sign in to your account</h1>
-          <p className="text-sm text-gray-600 mb-6 text-center">
-            Enter your credentials below to access your account
-          </p>
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <Input 
-              type="email" 
-              placeholder="name@example.com" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <Input 
-              type="password" 
-              placeholder="Password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <Button className="w-full" type="submit">
-              Sign In
-            </Button>
-          </form>
-          <p className="text-sm text-center mt-4">
-            Don't have an account? <Link to="/signup" className="text-blue-600 hover:underline">Sign up</Link>
-          </p>
-        </div>
-        <div></div>
       </div>
     </div>
   )
