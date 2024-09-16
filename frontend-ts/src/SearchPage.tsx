@@ -13,6 +13,11 @@ export default function SearchPage() {
     navigate(`/results?q=${encodeURIComponent(query)}`);
   };
 
+  const handleFileDrop = (file: File) => {
+    // Implement file drop logic here
+    console.log('File dropped:', file.name);
+  };
+
   return (
     <div className="relative min-h-screen w-full flex flex-col">
       <RetroGrid className="fixed inset-0" />
@@ -28,7 +33,7 @@ export default function SearchPage() {
             Our AI will scan millons of documents to help you find conflicting prior art<br />
             Save time, reduce risks, and get your patent to market faster.
           </p>
-          <SearchBar onSearch={handleSearch} />
+          <SearchBar onSearch={handleSearch} onFileDrop={handleFileDrop} />
         </div>
       </main>
     </div>

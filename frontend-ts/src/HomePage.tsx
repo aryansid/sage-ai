@@ -78,7 +78,7 @@ const HomePage: React.FC = () => {
           transition={{ delay: 0.8, duration: 0.8 }}
         >
           <button 
-            onClick={() => navigate('/search')}
+            onClick={() => navigate('/signup')}
             className="bg-white text-black hover:bg-gray-200 text-lg px-7 py-5 rounded-full transition-transform hover:scale-105"
             style={{ zIndex: 3 }}
           >

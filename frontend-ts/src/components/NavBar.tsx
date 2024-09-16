@@ -7,7 +7,7 @@ interface NavBarProps {
 
 const NavBar: React.FC<NavBarProps> = ({ currentPage }) => {
   const location = useLocation();
-  const navItems = ['Home', 'Search', 'Pricing', 'Contact Us'];
+  const navItems = ['Home', 'Search', 'Pricing', 'Contact'];
 
   return (
     <nav className="w-full bg-white shadow-sm">

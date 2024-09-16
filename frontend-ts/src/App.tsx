@@ -8,6 +8,7 @@ import HomePage from './HomePage';  // Import your existing HomePage
 import NavBar from './components/NavBar';  // Import the NavBar component
 import { Button } from './@/components/ui/button';  // Make sure this path is correct
 import SignInPage from './SignInPage';  // Import the SignInPage component
+import ContactPage from './ContactPage';  // Import the ContactPage component
 
 import './App.css';
 
@@ -22,7 +23,7 @@ function App() {
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />  {/* Add this new route */}
-          {/* ... existing routes ... */}
+          <Route path="/contact" element={<ContactPage />} />  
         </Routes>
       </div>
     </Router>

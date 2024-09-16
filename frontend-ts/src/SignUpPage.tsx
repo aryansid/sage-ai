@@ -7,13 +7,43 @@ export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [companyName, setCompanyName] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically handle the sign-up logic
-    // For now, we'll just navigate to the search page
-    navigate('/search');
+    setError('');
+    try {
+      const response = await fetch('http://localhost:8000/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, company_name: companyName }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.detail === "User already exists") {
+          setError("An account with this email already exists. Please log in instead.");
+        } else {
+          setError("An unexpected error occurred. Please try again later.");
+        }
+        return;
+      }
+
+      console.log('Signup successful:', data);
+      
+      // Here you might want to store the user data in your app's state
+      // For example, using a context or state management library
+
+      // Navigate to the search page or dashboard
+      navigate('/search');
+    } catch (error) {
+      console.error('Error during signup:', error);
+      setError("An unexpected error occurred. Please try again later.");
+    }
   };
 
   return (
@@ -64,6 +94,16 @@ export default function SignUpPage() {
               onChange={(e) => setCompanyName(e.target.value)}
               required
             />
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <span className="block sm:inline">{error}</span>
+                {error.includes("Please log in") && (
+                  <Link to="/signin" className="underline ml-2">
+                    Go to login
+                  </Link>
+                )}
+              </div>
+            )}
             <Button className="w-full bg-black text-white hover:bg-gray-800" type="submit">
               Sign Up
             </Button>
