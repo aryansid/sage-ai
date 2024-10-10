@@ -4,18 +4,33 @@ import { Input } from '../@/components/ui/input';
 import { Button } from '../@/components/ui/button';
 
 interface SearchBarProps {
-  onSearch: (query: string) => void;
-  onFileDrop: (file: File) => void;
+  onSearch: (results: any[]) => void;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onFileDrop }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+  const [query, setQuery] = useState('');
+  const [image, setImage] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const API_URL = 'https://your-render-app-name.onrender.com/api/retrieve';
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const input = inputRef.current;
-    if (input) onSearch(input.value);
+    const formData = new FormData();
+    if (query) formData.append('query', query);
+    if (image) formData.append('image', image);
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await response.json();
+      onSearch(data.results);
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -31,7 +46,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onFileDrop }) => {
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files[0];
-    if (file) onFileDrop(file);
+    if (file) setImage(file);
   };
 
   return (
@@ -50,6 +65,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onFileDrop }) => {
             style={{height: 'var(--input-height)', fontSize: 'var(--font-size)'}}
             placeholder="Enter description or drop a file..."
             type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
           />
           {isDragging && (
             <div className="absolute inset-0 flex items-center justify-center bg-blue-100 bg-opacity-50 rounded-md">
