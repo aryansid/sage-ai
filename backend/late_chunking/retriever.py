@@ -2,19 +2,19 @@
 
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
+import xml.etree.ElementTree as ET
+import os
 
 class Retriever:
     def __init__(self, text_embedder, image_embedder, text_embeddings, text_documents, image_embeddings, image_documents):
         self.text_embedder = text_embedder
         self.image_embedder = image_embedder
-        self.text_documents = text_documents  # List of tuples: (doc_text, doc_path)
-        self.image_documents = image_documents  # List of doc_paths
+        self.text_documents = text_documents
+        self.image_documents = image_documents
         self.text_embeddings = np.array(text_embeddings)
         self.image_embeddings = np.array(image_embeddings)
-        self.text_embedding_dim = self.text_embedder.embedding_dim
-        self.image_embedding_dim = self.image_embedder.embedding_dim
 
-    def retrieve(self, query_text=None, query_image_path=None, k=5):
+    def retrieve(self, query_text=None, query_image_path=None, k=10):
         num_docs = len(self.text_documents)
         similarities = np.zeros(num_docs)
         weight = 0
@@ -27,11 +27,9 @@ class Retriever:
 
         if query_image_path:
             query_image_embedding = self.image_embedder.embed(query_image_path)
-            # Compute image similarities
             image_similarities = np.zeros(num_docs)
             for idx, doc in enumerate(self.text_documents):
                 doc_path = doc[1]
-                # Find all image embeddings corresponding to this doc_path
                 indices = [i for i, img_doc in enumerate(self.image_documents) if img_doc == doc_path]
                 if indices:
                     doc_image_embeddings = self.image_embeddings[indices]
@@ -44,7 +42,32 @@ class Retriever:
             weight += 1
 
         if weight > 0:
-            similarities /= weight  # Average the similarities
+            similarities /= weight
 
         top_indices = np.argsort(similarities)[::-1][:k]
-        return [(similarities[i], self.text_documents[i][1]) for i in top_indices]
+        return self.process_results([(similarities[i], self.text_documents[i][1]) for i in top_indices])
+
+    def process_results(self, results):
+        processed_results = []
+        for similarity, doc_path in results:
+            xml_path = doc_path.replace('.ZIP', '.XML')
+            tif_files = [f for f in os.listdir(os.path.dirname(doc_path)) if f.endswith('.TIF')]
+            claims = self.extract_claims(xml_path)
+            processed_results.append({
+                'similarity': similarity,
+                'doc_path': doc_path,
+                'xml_path': xml_path,
+                'tif_files': tif_files,
+                'claims': claims
+            })
+        return processed_results
+
+    def extract_claims(self, xml_path):
+        try:
+            tree = ET.parse(xml_path)
+            root = tree.getroot()
+            claims = root.findall('.//claim')
+            return [claim.text for claim in claims]
+        except Exception as e:
+            print(f"Error extracting claims from {xml_path}: {e}")
+            return []
