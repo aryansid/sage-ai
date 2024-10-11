@@ -4,8 +4,8 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 from retriever import Retriever
-from backend.late_chunking.embedder import Embedder
-from backend.late_chunking.image_embedder import ImageEmbedder
+from late_chunking.embedder import Embedder
+from late_chunking.image_embedder import ImageEmbedder
 import numpy as np
 from supabase import create_client, Client
 
