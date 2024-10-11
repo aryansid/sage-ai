@@ -35,30 +35,16 @@ class SearchResult(BaseModel):
 @app.on_event("startup")
 async def startup_event():
     global retriever
-    # Load embeddings from Supabase
-    text_data = supabase.table("text_embeddings").select("*").execute()
-    image_data = supabase.table("image_embeddings").select("*").execute()
+    retriever = Retriever()
+    retriever.load_embeddings_from_supabase()
     
-    text_documents = [(item['text'], item['doc_path']) for item in text_data.data]
-    text_embeddings = [np.array(item['embedding']) for item in text_data.data]
-    
-    image_documents = [item['doc_path'] for item in image_data.data]
-    image_embeddings = [np.array(item['embedding']) for item in image_data.data]
-    
-    retriever = Retriever(text_embedder, image_embedder, text_documents, image_documents, text_embeddings, image_embeddings)
-
 @app.post("/search", response_model=List[SearchResult])
 async def search(query: Query):
     if retriever is None:
         raise HTTPException(status_code=500, detail="Retriever not initialized")
     
-    query_text_embedding = text_embedder.embed(query.text)
-    query_image_embedding = None
-    if query.image_path:
-        query_image_embedding = image_embedder.embed(query.image_path)
-    
-    results = retriever.retrieve(query_text_embedding, query_image_embedding, k=query.k)
-    return [SearchResult(document=doc, similarity=float(sim)) for doc, sim in results]
+    results = retriever.retrieve(query_text=query.text, query_image=query.image_path, k=query.k)
+    return [SearchResult(document=doc, similarity=float(sim)) for sim, doc in results]
 
 @app.get("/")
 async def root():
