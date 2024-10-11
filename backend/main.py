@@ -1,65 +1,69 @@
-from fastapi import FastAPI, HTTPException, UploadFile, Form
-from fastapi.middleware.cors import CORSMiddleware
-from late_chunking.retriever import Retriever
-from late_chunking.embedder import Embedder
-from late_chunking.image_embedder import ImageEmbedder
-from supabase import create_client, Client
-from dotenv import load_dotenv
 import os
-import json
-from PIL import Image
-import io
-
-load_dotenv()
+import pickle
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from typing import List, Optional
+from retriever import Retriever
+from embedder import Embedder
+from image_embedder import ImageEmbedder
+import numpy as np
+from supabase import create_client, Client
 
 app = FastAPI()
-supabase: Client = create_client(os.getenv('SUPABASE_URL'), os.getenv('SUPABASE_KEY'))
 
-# Configure CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Initialize Supabase client
+supabase_url = os.environ.get("SUPABASE_URL")
+supabase_key = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(supabase_url, supabase_key)
 
-# Load embeddings from Supabase
-def load_embeddings():
-    text_data = supabase.table('text_embeddings').select('*').execute()
-    text_embeddings = [json.loads(item['embedding']) for item in text_data.data]
-    text_documents = [(item['text'], item['doc_path']) for item in text_data.data]
-
-    image_data = supabase.table('image_embeddings').select('*').execute()
-    image_embeddings = [json.loads(item['embedding']) for item in image_data.data]
-    image_documents = [item['doc_path'] for item in image_data.data]
-
-    return text_embeddings, text_documents, image_embeddings, image_documents
-
-text_embeddings, text_documents, image_embeddings, image_documents = load_embeddings()
+# Initialize embedders
 text_embedder = Embedder()
 image_embedder = ImageEmbedder()
-retriever = Retriever(text_embedder, image_embedder, text_embeddings, text_documents, image_embeddings, image_documents)
 
-@app.post("/api/retrieve")
-async def retrieve(query: str = Form(None), image: UploadFile = None):
-    if not query and not image:
-        raise HTTPException(status_code=400, detail="Provide a query (text and/or image).")
+# Initialize retriever
+retriever = None
 
-    query_image_path = None
-    if image:
-        contents = await image.read()
-        img = Image.open(io.BytesIO(contents)).convert("RGB")
-        query_image_path = "temp_image.jpg"
-        img.save(query_image_path)
+class Query(BaseModel):
+    text: str
+    image_path: Optional[str] = None
+    k: int = 10
 
-    results = retriever.retrieve(query_text=query, query_image_path=query_image_path, k=10)
+class SearchResult(BaseModel):
+    document: str
+    similarity: float
 
-    if query_image_path:
-        os.remove(query_image_path)
+@app.on_event("startup")
+async def startup_event():
+    global retriever
+    # Load embeddings from Supabase
+    text_data = supabase.table("text_embeddings").select("*").execute()
+    image_data = supabase.table("image_embeddings").select("*").execute()
+    
+    text_documents = [(item['text'], item['doc_path']) for item in text_data.data]
+    text_embeddings = [np.array(item['embedding']) for item in text_data.data]
+    
+    image_documents = [item['doc_path'] for item in image_data.data]
+    image_embeddings = [np.array(item['embedding']) for item in image_data.data]
+    
+    retriever = Retriever(text_embedder, image_embedder, text_documents, image_documents, text_embeddings, image_embeddings)
 
-    return {"results": results}
+@app.post("/search", response_model=List[SearchResult])
+async def search(query: Query):
+    if retriever is None:
+        raise HTTPException(status_code=500, detail="Retriever not initialized")
+    
+    query_text_embedding = text_embedder.embed(query.text)
+    query_image_embedding = None
+    if query.image_path:
+        query_image_embedding = image_embedder.embed(query.image_path)
+    
+    results = retriever.retrieve(query_text_embedding, query_image_embedding, k=query.k)
+    return [SearchResult(document=doc, similarity=float(sim)) for doc, sim in results]
+
+@app.get("/")
+async def root():
+    return {"message": "Welcome to the Patent Search API"}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=10000)
