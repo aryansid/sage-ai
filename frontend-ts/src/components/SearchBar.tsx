@@ -1,21 +1,73 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Search, Upload } from 'lucide-react';
 import { Input } from '../@/components/ui/input';
 import { Button } from '../@/components/ui/button';
 
-interface SearchBarProps {
-  onSearch: (query: string) => void;
-  onFileDrop: (file: File) => void;
+interface PatentData {
+  title: string;
+  id: string;
+  abstract: string;
+  claims: string;
+  specification: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onFileDrop }) => {
+interface SearchBarProps {
+  onSearch: (results: PatentData[]) => void;
+  onLog: (query: string) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onLog }) => {
+  const [query, setQuery] = useState('');
+  const [image, setImage] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const API_URL = 'http://localhost:8000/search';
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (query) {
+        onLog(query);
+      }
+    }, 500); // Log after 500ms of inactivity
+
+    return () => clearTimeout(timeoutId);
+  }, [query, onLog]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const input = inputRef.current;
-    if (input) onSearch(input.value);
+    setError(null);
+    
+    const formData = new FormData();
+    formData.append('text', query);
+    if (image) {
+      formData.append('image', image);
+    }
+    formData.append('k', '10');
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Accept': 'application/json',
+          // Don't set 'Content-Type' header when sending FormData
+        },
+        mode: 'cors', // Explicitly set CORS mode
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+      }
+      
+      const data: PatentData[] = await response.json();
+      onSearch(data);
+    } catch (error) {
+      console.error('Error:', error);
+      setError(error instanceof Error ? error.message : 'An unknown error occurred');
+    }
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -31,7 +83,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onFileDrop }) => {
     e.preventDefault();
     setIsDragging(false);
     const file = e.dataTransfer.files[0];
-    if (file) onFileDrop(file);
+    if (file) setImage(file);
   };
 
   return (
@@ -50,6 +102,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, onFileDrop }) => {
             style={{height: 'var(--input-height)', fontSize: 'var(--font-size)'}}
             placeholder="Enter description or drop a file..."
             type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
           />
           {isDragging && (
             <div className="absolute inset-0 flex items-center justify-center bg-blue-100 bg-opacity-50 rounded-md">

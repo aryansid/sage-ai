@@ -13,31 +13,37 @@ export default function SignUpPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    console.log('Attempting to sign up with:', { email, password, companyName });
     try {
       const response = await fetch('http://localhost:8000/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password, company_name: companyName }),
+        body: JSON.stringify({ 
+          email, 
+          password, 
+          company_name: companyName,
+          company_email: email // Add this line to include company_email
+        }),
       });
 
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
 
       if (!response.ok) {
+        console.error('Signup failed:', data);
         if (data.detail === "User already exists") {
           setError("An account with this email already exists. Please log in instead.");
         } else {
-          setError("An unexpected error occurred. Please try again later.");
+          setError(data.detail || "An unexpected error occurred. Please try again later.");
         }
         return;
       }
 
       console.log('Signup successful:', data);
       
-      // Here you might want to store the user data in your app's state
-      // For example, using a context or state management library
-
       // Navigate to the search page or dashboard
       navigate('/search');
     } catch (error) {
